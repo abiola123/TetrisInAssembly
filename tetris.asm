@@ -66,25 +66,105 @@
 
 ;; TODO Insert your code here
 	main:
+	addi sp,zero,LEDS
 	call clear_leds
-	call wait
-	addi a0,zero,5
-	addi a1,zero,6
-	call set_pixel
-	call wait
-	addi a0,zero,2
-	addi a1,zero,0 
-	call set_pixel
-	addi a0,zero,11
-	addi a1,zero,4
-	call set_pixel
+	addi a0,zero,6
+	addi a1,zero,5
+	addi a2,zero,1
+	call set_gsa	
+
+	addi a0,zero,3
+	addi a1,zero,7
+	addi a2,zero,2
+	call set_gsa
+
+	addi a0,zero,1
+	addi a1,zero,1
+	addi a2,zero,1
+	call set_gsa
+
+	addi a0,zero,9
+	addi a1,zero,3
+	addi a2,zero,2
+	call set_gsa
+	
+	call draw_gsa
+	
 		ret
 
+; BEGIN:helper
+save_all_temporary_registers_in_stack:
+addi sp,sp,-4
+stw t0, 0(sp)
+addi sp,sp,-4
+stw t1, 0(sp)
+addi sp,sp,-4
+stw t2, 0(sp)
+addi sp,sp,-4
+stw t3, 0(sp)
+addi sp,sp,-4
+stw t4, 0(sp)
+addi sp,sp,-4
+stw t5, 0(sp)
+addi sp,sp,-4
+stw t6, 0(sp)
+addi sp,sp,-4 
+stw t7, 0(sp)
+	ret
+; END:helper
 
+; BEGIN:helper
+restore_all_temporary_registers_from_stack:
+ldw t7, 0(sp)
+addi sp,sp,4
+ldw t6, 0(sp)
+addi sp,sp,4
+ldw t5, 0(sp)
+addi sp,sp,4
+ldw t4, 0(sp)
+addi sp,sp,4
+ldw t3, 0(sp)
+addi sp,sp,4
+ldw t2, 0(sp)
+addi sp,sp,4
+ldw t1, 0(sp)
+addi sp,sp,4
+ldw t0, 0(sp)
+addi sp,sp,4
+	ret
+; END:helper
 
 ; BEGIN:draw_gsa
-
-; END:draw_gsa
+draw_gsa:
+addi s1,zero,12
+addi s2,zero,8
+addi sp,sp,-4
+stw ra,0(sp)
+while_outside:
+beq t0,s1,exit_outside
+	slli t3,s1,3
+	while_inside:
+	beq t1,s2,exit_inside
+		add t4,t3,t1
+		ldw t5,0(t4)
+		beq t5,zero,after_led_procedure
+		add a0,t0,zero
+		add a1,t1,zero
+		call save_all_temporary_registers_in_stack
+		call set_pixel	
+		call restore_all_temporary_registers_from_stack
+		after_led_procedure:
+		addi t1,t1,1
+	jmpi while_inside
+exit_inside:
+addi t0,t0,1
+jmpi while_outside
+cmplti t0,t0,1
+exit_outside:
+ldw ra, 0(sp)
+addi sp,sp,4
+	ret
+; END:draw_gsa-
 
 
 
@@ -100,7 +180,7 @@ blt a1,zero,return_one
 addi t0,zero,7
 bge a1,t0,return_one
 
-jmp return_zero
+jmpi return_zero
 
 return_one:
 addi v0,zero,1
@@ -118,7 +198,7 @@ addi v0,zero,0
 ; BEGIN:get_gsa
 get_gsa:
 #set correct position in gsa
-sll t0,a1,3
+slli t0,a1,3
 add t0,t0,a0
 
 #load the requested value
@@ -133,7 +213,7 @@ ldw v0,0x1014(t0)
 ; BEGIN:set_gsa
 set_gsa:
 #set correct position in gsa
-sll t0,a1,3
+slli t0,a1,3
 add t0,t0,a0
 
 #load the requested value

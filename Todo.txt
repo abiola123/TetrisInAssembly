@@ -2,3 +2,5 @@
 -pas sur de si je dois utiliser des signed ou des unsigned
 
 
+******* draw_gsa **********
+-que faire si on doit metttre une certaine led a 0 ?
