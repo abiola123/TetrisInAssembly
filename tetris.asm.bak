@@ -68,17 +68,28 @@
 	main:
 	addi sp,zero,LEDS
 	call clear_leds
-	call wait
-	addi a0,zero,5
-	addi a1,zero,6
-	call set_pixel
-	call wait
-	addi a0,zero,2
-	addi a1,zero,0 
-	call set_pixel
-	addi a0,zero,11
-	addi a1,zero,4
-	call set_pixel
+	addi a0,zero,6
+	addi a1,zero,5
+	addi a2,zero,1
+	call set_gsa	
+
+	addi a0,zero,3
+	addi a1,zero,7
+	addi a2,zero,2
+	call set_gsa
+
+	addi a0,zero,1
+	addi a1,zero,1
+	addi a2,zero,1
+	call set_gsa
+
+	addi a0,zero,9
+	addi a1,zero,3
+	addi a2,zero,2
+	call set_gsa
+	
+	call draw_gsa
+	
 		ret
 
 ; BEGIN:helper
@@ -125,15 +136,15 @@ addi sp,sp,4
 
 ; BEGIN:draw_gsa
 draw_gsa:
-addi s1,zero,12
-addi s2,zero,8
+addi t6,zero,12
+addi t7,zero,8
 addi sp,sp,-4
 stw ra,0(sp)
 while_outside:
-beq t0,s1,exit_outside
-	slli t3,s1,3
+beq t0,t6,exit_outside
+	slli t3,t0,3
 	while_inside:
-	beq t1,s2,exit_inside
+	beq t1,t7,exit_inside
 		add t4,t3,t1
 		ldw t5,0(t4)
 		beq t5,zero,after_led_procedure
@@ -148,7 +159,6 @@ beq t0,s1,exit_outside
 exit_inside:
 addi t0,t0,1
 jmpi while_outside
-cmplti t0,t0,1
 exit_outside:
 ldw ra, 0(sp)
 addi sp,sp,4
@@ -205,8 +215,9 @@ set_gsa:
 slli t0,a1,3
 add t0,t0,a0
 
-#load the requested value
+#store  value
 stw a2,0x1014(t0)
+	ret
 ; END:set_gsa
 
 

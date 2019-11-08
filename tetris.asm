@@ -136,15 +136,17 @@ addi sp,sp,4
 
 ; BEGIN:draw_gsa
 draw_gsa:
-addi s1,zero,12
-addi s2,zero,8
+add t0, zero, zero
+add t1,zero,zero
+addi t6,zero,12
+addi t7,zero,8
 addi sp,sp,-4
 stw ra,0(sp)
 while_outside:
-beq t0,s1,exit_outside
-	slli t3,s1,3
+beq t0,t6,exit_outside
+	slli t3,t0,3
 	while_inside:
-	beq t1,s2,exit_inside
+	beq t1,t7,exit_inside
 		add t4,t3,t1
 		ldw t5,0(t4)
 		beq t5,zero,after_led_procedure
@@ -159,7 +161,6 @@ beq t0,s1,exit_outside
 exit_inside:
 addi t0,t0,1
 jmpi while_outside
-cmplti t0,t0,1
 exit_outside:
 ldw ra, 0(sp)
 addi sp,sp,4
@@ -216,8 +217,9 @@ set_gsa:
 slli t0,a1,3
 add t0,t0,a0
 
-#load the requested value
+#store  value
 stw a2,0x1014(t0)
+	ret
 ; END:set_gsa
 
 
