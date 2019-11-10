@@ -69,66 +69,96 @@
 	addi sp,zero,LEDS
 	call clear_leds
 
+	addi a0,zero,1
+	addi a1,zero,4
+	addi a2,zero,1
+	call set_gsa
 
-	addi a0, zero, 6
-	addi a1,zero, 4
-	call set_pixel
-	#addi a0,zero,1
-	#addi a1,zero,4
-	#addi a2,zero,1
-	#call set_gsa
+	addi a0,zero,0
+	addi a1,zero,1
+	addi a2,zero,1
+	call set_gsa	
 
-	#addi a0,zero,0
-	#addi a1,zero,1
-	#addi a2,zero,1
-	#call set_gsa	
+	addi a0,zero,0
+	addi a1,zero,2
+	addi a2,zero,2
+	call set_gsa
 
-	#addi a0,zero,0
-	#addi a1,zero,2
-	#addi a2,zero,2
-	#call set_gsa
+	addi a0,zero,0
+	addi a1,zero,3
+	addi a2,zero,1
+	call set_gsa
 
-	#addi a0,zero,0
-	#addi a1,zero,3
-	#addi a2,zero,1
-	#call set_gsa
 
-	#addi a0,zero,0
-	#addi a1,zero,4
-	#addi a2,zero,2
-	#call set_gsa
-
-	#addi a0,zero,9
-	#addi a1,zero,3
-	#addi a2,zero,2
-	#call set_gsa
-
-	#addi a0,zero,9
-	#addi a1,zero,3
-	#addi a2,zero,2
-	#call set_gsa
-
-	#addi a0,zero,9
-	#addi a1,zero,3
-	#addi a2,zero,2
-	#call set_gsa
-
-	#addi a0,zero,9
-	#addi a1,zero,3
-	#addi a2,zero,2
-	#call set_gsa
-
-	#addi a0,zero,9
-	#addi a1,zero,3
-	#addi a2,zero,2
-	#call set_gsa
 	
-	#call draw_gsa
+	call draw_gsa
 	
 		ret
 
+
+; BEGIN:draw_tetromino
+	draw_tetromino:
+	add a2,a0,zero
+	#addi sp,sp,-4
+	#stw a0, 0(sp)
+	ldw t0, T_X(zero)
+	ldw t1, T_Y(zero)
+	ldw t2, T_type(zero)
+	ldw t3, T_orientation(zero)
+
+#find location in each array (draw_ay and draw_ax)
+	add t4,t2,zero
+	slli t4,t4,2
+	add t4,t4,t3
+#because we are making steps of 4 in coordinates we need to shift the final result by 2 to get to the correct position
+	slli t4,t4,2
+
+#load x and y offsets
+	ldw t5,DRAW_Ax(t4)
+	ldw t6,DRAW_Ay(t4)
+
+#draw x and y that are given
+
+	add a0,t0,zero
+	add a1,t1,zero
+	call set_gsa
+
+#first offset
+	ldw t7, 0(t5)
+	ldw t8, 0(t6)
+
+	add a0,t0,t7
+	add a1,t1,t8
+	call set_gsa
+
+#second offset
+	addi t5,t5,4
+	addi t6,t6,4
+	ldw t7, 0(t5)
+	ldw t8, 0(t6)
+
+	add a0,t0,t7
+	add a1,t1,t8
+	call set_gsa
+
+#third offset
+	addi t5,t5,4
+	addi t6,t6,4
+	ldw t7, 0(t5)
+	ldw t8, 0(t6)
+
+	add a0,t0,t7
+	add a1,t1,t8
+	call set_gsa
+
+call draw_gsa
+
+	ret
+
+; END:draw_tetromino
+
 ; BEGIN:helper
-save_all_temporary_registers_in_stack:
+	save_all_temporary_registers_in_stack:
 addi sp,sp,-4
 stw t0, 0(sp)
 addi sp,sp,-4
@@ -149,7 +179,7 @@ stw t7, 0(sp)
 ; END:helper
 
 ; BEGIN:helper
-restore_all_temporary_registers_from_stack:
+	restore_all_temporary_registers_from_stack:
 ldw t7, 0(sp)
 addi sp,sp,4
 ldw t6, 0(sp)
@@ -168,6 +198,8 @@ ldw t0, 0(sp)
 addi sp,sp,4
 	ret
 ; END:helper
+
+
 
 ; BEGIN:draw_gsa
 draw_gsa:
@@ -280,11 +312,12 @@ stw zero, LEDS(r9)
 
 
 
+
+
 ; BEGIN:set_pixel
 set_pixel:
 #least significant bits
-slli t0,a0,30
-srli t0,s0,30
+andi t0,a0,3
 #most significant bit
 srli t1,a0,2
 
@@ -323,6 +356,8 @@ stw t7,0x2000(v0)
 
 
 
+
+
 ; BEGIN:wait
 wait:
 addi s0,zero,2
@@ -330,6 +365,7 @@ slli a0,s0,20
 jmpi while
   ret
 ; END:wait
+
 
 
 ############################helper methods for wait
@@ -433,7 +469,7 @@ C_E_Y:
 C_So_X:
 .word 0x01
 .word 0x00
-.word 0xFFFFFFFF
+.word 0x^^^^^^^^^^^^^^^^
 
 C_So_Y:
 .word 0x00
