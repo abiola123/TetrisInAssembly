@@ -68,27 +68,62 @@
 	main:
 	addi sp,zero,LEDS
 	call clear_leds
-	addi a0,zero,6
-	addi a1,zero,5
-	addi a2,zero,1
-	call set_gsa	
 
-	addi a0,zero,3
-	addi a1,zero,7
-	addi a2,zero,2
-	call set_gsa
 
-	addi a0,zero,1
-	addi a1,zero,1
-	addi a2,zero,1
-	call set_gsa
+	addi a0, zero, 6
+	addi a1,zero, 4
+	call set_pixel
+	#addi a0,zero,1
+	#addi a1,zero,4
+	#addi a2,zero,1
+	#call set_gsa
 
-	addi a0,zero,9
-	addi a1,zero,3
-	addi a2,zero,2
-	call set_gsa
+	#addi a0,zero,0
+	#addi a1,zero,1
+	#addi a2,zero,1
+	#call set_gsa	
+
+	#addi a0,zero,0
+	#addi a1,zero,2
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,0
+	#addi a1,zero,3
+	#addi a2,zero,1
+	#call set_gsa
+
+	#addi a0,zero,0
+	#addi a1,zero,4
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,9
+	#addi a1,zero,3
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,9
+	#addi a1,zero,3
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,9
+	#addi a1,zero,3
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,9
+	#addi a1,zero,3
+	#addi a2,zero,2
+	#call set_gsa
+
+	#addi a0,zero,9
+	#addi a1,zero,3
+	#addi a2,zero,2
+	#call set_gsa
 	
-	call draw_gsa
+	#call draw_gsa
 	
 		ret
 
@@ -144,18 +179,18 @@ addi sp,sp,-4
 stw ra,0(sp)
 while_outside:
 beq t0,t6,exit_outside
-	slli t3,t0,3
+	add t1,zero,zero
 	while_inside:
 	beq t1,t7,exit_inside
-		add t4,t3,t1
-		ldw t5,0(t4)
-		beq t5,zero,after_led_procedure
 		add a0,t0,zero
 		add a1,t1,zero
 		call save_all_temporary_registers_in_stack
+		call get_gsa
+		add t5,v0,zero
+		beq t5,zero,after_led_procedure
 		call set_pixel	
-		call restore_all_temporary_registers_from_stack
 		after_led_procedure:
+		call restore_all_temporary_registers_from_stack
 		addi t1,t1,1
 	jmpi while_inside
 exit_inside:
@@ -199,11 +234,15 @@ addi v0,zero,0
 ; BEGIN:get_gsa
 get_gsa:
 #set correct position in gsa
-slli t0,a1,3
-add t0,t0,a0
+slli t0,a0,3
+add t0,t0,a1
+
+#multiply by 4 because the coordinates in ram change in steps of 4
+slli t0,t0,2
 
 #load the requested value
 ldw v0,0x1014(t0)
+	ret
 ; END:get_gsa
 
 
@@ -214,8 +253,11 @@ ldw v0,0x1014(t0)
 ; BEGIN:set_gsa
 set_gsa:
 #set correct position in gsa
-slli t0,a1,3
-add t0,t0,a0
+slli t0,a0,3
+add t0,t0,a1
+
+#multiply by 4 because the coordinates in ram change in steps of 4
+slli t0,t0,2
 
 #store  value
 stw a2,0x1014(t0)
@@ -241,39 +283,39 @@ stw zero, LEDS(r9)
 ; BEGIN:set_pixel
 set_pixel:
 #least significant bits
-slli s0,a0,30
-srli s0,s0,30
+slli t0,a0,30
+srli t0,s0,30
 #most significant bit
-srli s1,a0,2
+srli t1,a0,2
 
 #values to compare for index of led
-addi s2, zero, 1
-addi s3, zero, 2
-addi s4, zero, 3
+addi t2, zero, 1
+addi t3, zero, 2
+addi t4, zero, 3
 ###
-beq s0,s4,loadThirdColumn
-beq s0,s3,loadSecondColumn
-beq s0,s2,loadFirstColumn
-beq s0,zero,loadZeroColumn
+beq t0,t4,loadThirdColumn
+beq t0,t3,loadSecondColumn
+beq t0,t2,loadFirstColumn
+beq t0,zero,loadZeroColumn
 
 insideSetPixelAfterLoadingColumn:
 
-slli s6,v0,3
-add s6,s6,a1
+slli t6,v0,3
+add t6,t6,a1
 
-beq s1,s3,loadLedArrayTwo
-beq s1,s2,loadLedArrayOne
-beq s1,zero,loadLedArrayZero
+beq t1,t3,loadLedArrayTwo
+beq t1,t2,loadLedArrayOne
+beq t1,zero,loadLedArrayZero
 
 insideSetPixelAfterLoadingArray:
 
-ldw s5, 0x2000(v0)
+ldw t5, 0x2000(v0)
 
-addi s7,zero,1
-sll s7,s7,s6
-or s7,s7,s5
+addi t7,zero,1
+sll t7,t7,t6
+or t7,t7,t5
 
-stw s7,0x2000(v0)
+stw t7,0x2000(v0)
   ret
 ; END:set_pixel
 
