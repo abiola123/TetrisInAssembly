@@ -69,32 +69,40 @@
 	addi sp,zero,LEDS
 	call clear_leds
 
-	addi a0,zero,1
-	addi a1,zero,4
-	addi a2,zero,1
-	call set_gsa
-
-	addi a0,zero,0
-	addi a1,zero,1
-	addi a2,zero,1
-	call set_gsa	
-
-	addi a0,zero,0
-	addi a1,zero,2
-	addi a2,zero,2
-	call set_gsa
-
-	addi a0,zero,0
-	addi a1,zero,3
-	addi a2,zero,1
-	call set_gsa
+	addi t0,zero,3
+	stw t0, RANDOM_NUM(zero)
+	call generate_tetromino
 
 
-	
-	call draw_gsa
-	
 		ret
 
+
+; BEGIN:generate_tetromino
+	generate_tetromino:
+
+	add t0,zero,zero
+	addi t3,zero,6
+	addi t4,zero,1
+	
+
+	loop_c:
+	ldw t0,RANDOM_NUM(zero)
+	andi t0,t0,7
+	cmpltui t1,t0,5
+	bne t1,zero,test_passed
+	jmpi loop_c
+	test_passed:
+	stw zero, T_orientation(zero)	
+	stw t3, T_X(zero)
+	stw t4, T_Y(zero)
+	stw t0, T_type(zero)
+
+	call draw_tetromino
+	
+	
+	ret
+
+; END:generate_tetromino
 
 ; BEGIN:draw_tetromino
 	draw_tetromino:
@@ -125,30 +133,30 @@
 
 #first offset
 	ldw t7, 0(t5)
-	ldw t8, 0(t6)
+	ldw t3, 0(t6)
 
 	add a0,t0,t7
-	add a1,t1,t8
+	add a1,t1,t3
 	call set_gsa
 
 #second offset
 	addi t5,t5,4
 	addi t6,t6,4
 	ldw t7, 0(t5)
-	ldw t8, 0(t6)
+	ldw t3, 0(t6)
 
 	add a0,t0,t7
-	add a1,t1,t8
+	add a1,t1,t3
 	call set_gsa
 
 #third offset
 	addi t5,t5,4
 	addi t6,t6,4
 	ldw t7, 0(t5)
-	ldw t8, 0(t6)
+	ldw t3, 0(t6)
 
 	add a0,t0,t7
-	add a1,t1,t8
+	add a1,t1,t3
 	call set_gsa
 
 call draw_gsa
@@ -469,7 +477,7 @@ C_E_Y:
 C_So_X:
 .word 0x01
 .word 0x00
-.word 0x^^^^^^^^^^^^^^^^
+.word 0x01
 
 C_So_Y:
 .word 0x00
