@@ -16,4 +16,4 @@ Once that the code was loaded to the FPGA:
 
 The final result ressembles to what you can see in this video:
 
-![video](https://youtu.be/I7pAttwhQZk)
+[![video](https://imgur.com/a/AZsKuDw)](https://youtu.be/I7pAttwhQZk)
