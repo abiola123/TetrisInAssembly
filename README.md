@@ -16,4 +16,4 @@ Once that the code was loaded to the FPGA:
 
 The final result ressembles to what you can see in this video:
 
-![video](https://github.com/abiola123/TetrisNios2AssemblyEPFL_BA3_ArchOrd/blob/master/Media/Tetris%20game%20playing%201.mp4)
+![video](https://youtu.be/I7pAttwhQZk)
