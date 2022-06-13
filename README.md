@@ -17,3 +17,10 @@ Once that the code was loaded to the FPGA:
 The final result ressembles to what you can see in this video:
 
 [![video](https://imgur.com/a/AZsKuDw)](https://youtu.be/I7pAttwhQZk)
+
+    <iframe width="560" height="315"
+
+src="https://youtu.be/I7pAttwhQZk"
+frameborder="0"
+allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+allowfullscreen></iframe>
